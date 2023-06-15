@@ -1,0 +1,17 @@
+#!bin/bash
+
+
+
+
+# Update system
+which dnf  &> /dev/null && echo "dnf update -y" > /tmp/update.sh
+which flatpak  &> /dev/null && echo "flatpak update -y" >> /tmp/update.sh
+which apt  &> /dev/null && echo "apt udpate -y" >> /tmp/update.sh
+which pacman  &> /dev/null && echo "pacman -Syu" >> /tmp/update.sh
+sudo sh /tmp/update.sh && rm /tmp/update.sh
+
+# WiFi
+read -p "WiFi-Name: " WIFINAME && read -p "WiFi Password: " WIFIPASSWORD
+WIFIDEVICE=$(networkctl | grep unmanaged | awk 'xor(/wlan/,/wifi/)' | head -1 | awk '{print $2}')
+sudo service systemd-networkd restart
+nmcli d wifi connect "$WIFINAME" password $WIFIPASSWORD ifname $WIFIDEVICE
