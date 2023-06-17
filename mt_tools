@@ -1,17 +1,71 @@
 #!bin/bash
 
+# Initiator
+
+PROGRAM=$1
 
 
 
-# Update system
-which dnf  &> /dev/null && echo "dnf update -y" > /tmp/update.sh
-which flatpak  &> /dev/null && echo "flatpak update -y" >> /tmp/update.sh
-which apt  &> /dev/null && echo "apt udpate -y" >> /tmp/update.sh
-which pacman  &> /dev/null && echo "pacman -Syu" >> /tmp/update.sh
-sudo sh /tmp/update.sh && rm /tmp/update.sh
 
-# WiFi
-read -p "WiFi-Name: " WIFINAME && read -p "WiFi Password: " WIFIPASSWORD
-WIFIDEVICE=$(networkctl | grep unmanaged | awk 'xor(/wlan/,/wifi/)' | head -1 | awk '{print $2}')
-sudo service systemd-networkd restart
-nmcli d wifi connect "$WIFINAME" password $WIFIPASSWORD ifname $WIFIDEVICE
+
+case "$1" in 
+  -u*)
+    case "$1" in
+      *p*)
+        # Update system
+        which dnf  &> /dev/null && echo "dnf update -y" > /tmp/update.sh
+        which flatpak  &> /dev/null && echo "flatpak update -y" >> /tmp/update.sh
+        which apt  &> /dev/null && echo "apt udpate -y" >> /tmp/update.sh
+        which pacman  &> /dev/null && echo "pacman -Syu" >> /tmp/update.sh
+        sudo sh /tmp/update.sh && rm /tmp/update.sh
+      ;;
+    esac
+  ;;
+  -h*)
+    # Help
+    printf "
+    Welcome to the mt_tools, a set of scripts used for automating and simplifying normal end-user day-to-day workflows. 
+    
+    Usage: mt_tools [PROGRAM] [OPTIONS]  
+      -  -h    help            Display this help page
+      -  -u    update          Update parts of your system
+        -  -h  help            More detailed help page for the update tool
+        -  -s  system          Update everything listed below
+        -  -p  packages        Update your packages and programs
+        -  -c  config          Pulls the latest config by martyTF (https://github.com/martyTF/dotfiles) and applies it
+      -  -nw   network         Manage your connections
+        - -w   wifi            Scan for and connect to available WiFi connections 
+          - -s scan            Only scan for available WiFi connections
+          - -c connect         Connect to WiFi by WiFi-Name and WiFi-Password
+          - -l list            List saved WiFi networks
+        - -b   bluetooth       Scan for and connect to available Bluetooth devices
+
+
+    " 
+  ;;
+  -nw*)
+    case "$1" in
+      *w*)
+        case "$1" in
+          *s*)
+          ;;
+          *c*)
+            # WiFi
+            read -p "WiFi-Name: " WIFINAME && read -p "WiFi Password: " WIFIPASSWORD
+            WIFIDEVICE=$(networkctl | grep unmanaged | awk 'xor(/wlan/,/wifi/)' | head -1 | awk '{print $2}')
+            nmcli d wifi connect "$WIFINAME" password $WIFIPASSWORD ifname $WIFIDEVICE
+          ;;
+          *l*)
+          ;;
+        esac
+      ;;
+      *b*)
+      ;;
+    esac
+  ;;
+  "")
+
+  ;;
+esac
+
+
