@@ -2,26 +2,94 @@
 
 # Initiator
 
-PROGRAM=$1
-
-
-
-
-
-case "$1" in 
-  -u*)
-    case "$1" in
-      *p*)
+case "$1" in
+update | -u)
+    case "$2" in
+    packages | -p)
         # Update system
-        which dnf  &> /dev/null && echo "dnf update -y" > /tmp/update.sh
-        which flatpak  &> /dev/null && echo "flatpak update -y" >> /tmp/update.sh
-        which apt  &> /dev/null && echo "apt udpate -y" >> /tmp/update.sh
-        which pacman  &> /dev/null && echo "pacman -Syu" >> /tmp/update.sh
+        which dnf &>/dev/null && echo "dnf update -y" >/tmp/update.sh
+        which flatpak &>/dev/null && echo "flatpak update -y" >>/tmp/update.sh
+        which apt &>/dev/null && echo "apt udpate -y" >>/tmp/update.sh
+        which pacman &>/dev/null && echo "pacman -Syu" >>/tmp/update.sh
         sudo sh /tmp/update.sh && rm /tmp/update.sh
-      ;;
+        ;;
+    "")
+        printf "
+        -  -h  help            More detailed help page for the update tool
+        -  -s  system          Update everything listed below
+        -  -p  packages        Update your packages and programs
+        -  -c  config          Pulls the latest config by martyTF (https://github.com/martyTF/dotfiles) and applies it
+        
+        "
+        ;;
     esac
-  ;;
-  -h*)
+    ;;
+
+network | -nw)
+    case "$2" in
+    wifi | -w)
+        case "$3" in
+        scan | -s) ;;
+
+        connect | -c)
+            # WiFi
+            read -p "WiFi-Name: " WIFINAME && read -p "WiFi Password: " WIFIPASSWORD
+            WIFIDEVICE=$(networkctl | grep unmanaged | awk 'xor(/wlan/,/wifi/)' | head -1 | awk '{print $2}')
+            nmcli d wifi connect "$WIFINAME" password "$WIFIPASSWORD" ifname "$WIFIDEVICE"
+            ;;
+        list | -l) ;;
+
+        esac
+        ;;
+    bluetooth | -b) ;;
+
+    esac
+
+    ;;
+sleep)
+    CHECKTIME='^[0-2]+[0-9]+:+[0-5]+[0-9]'
+    if [ $# = 1 ]; then
+        printf "   
+        No time has been specified. This will suspend your Computer until you power it up again.
+        To automatically wake up your PC at a set time, use the following syntax:
+        Syntax: mt_tools sleep [time]
+        Reminder that time is in the 24 hour format.
+        "
+        read -p "Proceed? Y/n" PROCEED
+        if [ "$PROCEED" = n ]; then
+          exit
+        else
+        systemctl suspend
+        fi
+    elif [[ $2 =~ $CHECKTIME ]]; then
+
+        HUMANTIMESET=$2                                                                   # reads input
+        PCTIMESET=$(echo $HUMANTIMESET | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }') # transforms input into pc readable
+        # Check for today/tomorrow:
+        CHECKTODAY=$(date +%s -d 'today 0:00')           # gets time of the beginning of today
+        WAKEUPTIMETODAY=$(($PCTIMESET + $CHECKTODAY))    # adds pctimeset in seconds (/100 to get hours, x3600 to get seconds to checktoday to get the wakeuptimetoday if it's past midnight
+        WAKEUPTIMETOMORROW=$(($WAKEUPTIMETODAY + 86400)) # adds 1 day of unix timestamp to wakeuptimetoday to get wakeuptimetomorrow
+        # Execute the whole thing:
+        if [ $WAKEUPTIMETODAY -ge $(date +%s) ]; then # if wakeuptimetoday is greater than current time, then it's before midnight
+            sudo echo "Waking up Today at $HUMANTIMESET ! Good Night!"
+            sleep 10
+            sudo rtcwake -m mem -t $WAKEUPTIMETODAY # Wake up at wakeuptime today
+        else
+            sudo echo "Waking up Tomorrow at $HUMANTIMESET ! Good Night!"
+            sleep 10
+            sudo rtcwake -m mem -t $WAKEUPTIMETOMORROW # Wake up at wakeuptime tomorrow
+        fi
+    else
+        printf "
+        Too many arguments, or time has been entered wrongly. 
+        Make sure you are using the 24 hour format, and not AM/PM.
+        Syntax: mt_tools sleep [time]
+        "
+    fi
+
+    ;;
+
+"" | help | -h | --help)
     # Help
     printf "
     Welcome to the mt_tools, a set of scripts used for automating and simplifying normal end-user day-to-day workflows. 
@@ -41,31 +109,6 @@ case "$1" in
         - -b   bluetooth       Scan for and connect to available Bluetooth devices
 
 
-    " 
-  ;;
-  -nw*)
-    case "$1" in
-      *w*)
-        case "$1" in
-          *s*)
-          ;;
-          *c*)
-            # WiFi
-            read -p "WiFi-Name: " WIFINAME && read -p "WiFi Password: " WIFIPASSWORD
-            WIFIDEVICE=$(networkctl | grep unmanaged | awk 'xor(/wlan/,/wifi/)' | head -1 | awk '{print $2}')
-            nmcli d wifi connect "$WIFINAME" password $WIFIPASSWORD ifname $WIFIDEVICE
-          ;;
-          *l*)
-          ;;
-        esac
-      ;;
-      *b*)
-      ;;
-    esac
-  ;;
-  "")
-
-  ;;
+    "
+    ;;
 esac
-
-
