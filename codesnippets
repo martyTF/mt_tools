@@ -50,3 +50,6 @@ which am  &> /dev/null && echo "am update" >> /tmp/update.sh
 
 
 #snap, flatpak, appimages,
+
+
+

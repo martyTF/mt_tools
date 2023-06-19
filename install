@@ -1,0 +1,98 @@
+#!/bin/bash
+
+
+# SHELLRC finder
+case "$SHELL" in
+*bash*)
+    SHELLRC="$HOME/.bashrc" && export SHELLRC
+    ;;
+*zsh*)
+    SHELLRC="$HOME/.zshrc" && export SHELLRC
+    ;;
+esac
+
+# PACKAGEMANAGER finder
+which dnf &>/dev/null && PACKAGEMANAGER="dnf"
+which apt &>/dev/null && PACKAGEMANAGER="apt"
+which pacman &>/dev/null && PACKAGEMANAGER="pacman"
+
+cat $SHELLRC | grep "PACKAGEMANAGER" && ISPACMAN=1 || ISPACMAN=0
+
+case $ISPACMAN in
+0)
+    export PACKAGEMANAGER
+    echo "PACKAGEMANAGER=$PACKAGEMANAGER" >>$SHELLRC
+    echo "export PACKAGEMANAGER" >>$SHELLRC
+    ;;
+1)
+    echo "Package manager set to $PACKAGEMANAGER"
+    ;;
+esac
+
+# PMINSTALL and PMUPDATE manager
+
+case $PACKAGEMANAGER in
+dnf)
+    PMINSTALL="sudo dnf install"
+    echo "sudo dnf update" >/tmp/mt_update
+    ;;
+apt)
+    PMINSTALL="sudo apt install"
+    echo "sudo apt update" >/tmp/mt_update
+    ;;
+pacman)
+    PMINSTALL="sudo pacman -S"
+    echo "sudo pacman -Syu" >/tmp/mt_update
+    ;;
+esac
+
+which flatpak  &> /dev/null && echo "flatpak update" >> /tmp/mt_update
+which snap  &> /dev/null && echo "snap update" >> /tmp/mt_update
+which am  &> /dev/null && echo "am update" >> /tmp/mt_update
+
+
+
+# required programs
+PACKAGESREQ="zsh flatpak git"
+$PMINSTALL $PACKAGESREQ
+
+
+# install flatpak
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+
+read -p "Install heavily recommended proprietary software? [Y/n]:  " INSTALLPACKAGESPROP
+case $INSTALLPACKAGESPROP in
+n) echo "Skipping proprietary software.";;
+"" | *)
+PACKAGESPROP="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+$PMINSTALL $PACKAGESPROP;;
+esac
+
+# important programs
+read -p "Install recommended software? [Y/n]:  " INSTALLPACKAGESIMP
+case $INSTALLPACKAGESIMP in
+n) echo "Skipping important software.";;
+"" | *)
+PACKAGESIMP="kitty bat neofetch ranger"
+$PMINSTALL $PACKAGESIMP;;
+esac
+
+
+# optional programs
+read -p "Install optional software? [y/N]:  " INSTALLPACKAGESOPT
+case INSTALLPACKAGESOPT in
+y | Y | yes | Yes | YES)
+flatpak install flathub md.obsidian.Obsidian
+flatpak install flathub com.vscodium.codium;;
+"" | *) echo "Skipping optional software."
+esac
+
+
+
+
+
+# configuration
+
+mkdir $HOME/git $HOME/Applications "$HOME"/.config/mt_tools
+mkdir -p $HOME/.config/sway && cp -i /etc/sway/config $HOME/.config/sway/
