@@ -1,0 +1,52 @@
+#!/bin/bash
+# SHELLRC finder
+case "$SHELL" in
+*bash*)
+    SHELLRC="$HOME/.bashrc" && export SHELLRC
+    ;;
+*zsh*)
+    SHELLRC="$HOME/.zshrc" && export SHELLRC
+    ;;
+esac
+
+# PACKAGEMANAGER finder
+which dnf &>/dev/null && PACKAGEMANAGER="dnf"
+which apt &>/dev/null && PACKAGEMANAGER="apt"
+which pacman &>/dev/null && PACKAGEMANAGER="pacman"
+
+cat $SHELLRC | grep "PACKAGEMANAGER" && ISPACMAN=1 || ISPACMAN=0
+
+case $ISPACMAN in
+0)
+    export PACKAGEMANAGER
+    echo "PACKAGEMANAGER=$PACKAGEMANAGER" >>$SHELLRC
+    echo "export PACKAGEMANAGER" >>$SHELLRC
+    ;;
+1)
+    echo "Package manager set to $PACKAGEMANAGER"
+    ;;
+esac
+
+# PMINSTALL and PMUPDATE manager
+
+case $PACKAGEMANAGER in
+dnf)
+    PMINSTALL="sudo dnf install"
+    echo "sudo dnf update" >/tmp/mt_update
+    ;;
+apt)
+    PMINSTALL="sudo apt install"
+    echo "sudo apt update" >/tmp/mt_update
+    ;;
+pacman)
+    PMINSTALL="sudo pacman -S"
+    echo "sudo pacman -Syu" >/tmp/mt_update
+    ;;
+esac
+
+which flatpak  &> /dev/null && echo "flatpak update" >> /tmp/update.sh
+which snap  &> /dev/null && echo "snap update" >> /tmp/update.sh
+which am  &> /dev/null && echo "am update" >> /tmp/update.sh
+
+
+#snap, flatpak, appimages,
