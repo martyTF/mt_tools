@@ -58,7 +58,9 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 
 read -p "Install heavily recommended proprietary software? [Y/n]:  " INSTALLPACKAGESPROP
 case $INSTALLPACKAGESPROP in
-n) echo "Skipping proprietary software." ;;
+n)
+    echo "Skipping proprietary software."
+    ;;
 "" | *)
     case $PACKAGEMANAGER in
     dnf)
