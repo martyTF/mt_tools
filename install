@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # SHELLRC finder
 case "$SHELL" in
 *bash*)
@@ -46,51 +45,56 @@ pacman)
     ;;
 esac
 
-which flatpak  &> /dev/null && echo "flatpak update" >> /tmp/mt_update
-which snap  &> /dev/null && echo "snap update" >> /tmp/mt_update
-which am  &> /dev/null && echo "am update" >> /tmp/mt_update
-
-
+which flatpak &>/dev/null && echo "flatpak update" >>/tmp/mt_update
+which snap &>/dev/null && echo "snap update" >>/tmp/mt_update
+which am &>/dev/null && echo "am update" >>/tmp/mt_update
 
 # required programs
 PACKAGESREQ="zsh flatpak git"
 $PMINSTALL $PACKAGESREQ
 
-
 # install flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-
 read -p "Install heavily recommended proprietary software? [Y/n]:  " INSTALLPACKAGESPROP
 case $INSTALLPACKAGESPROP in
-n) echo "Skipping proprietary software.";;
+n) echo "Skipping proprietary software." ;;
 "" | *)
-PACKAGESPROP="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-$PMINSTALL $PACKAGESPROP;;
+    case $PACKAGEMANAGER in
+    dnf)
+        sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+        sudo dnf install gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
+        sudo dnf install gstreamer1-plugins-{bad-*,good-*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel
+        sudo dnf install lame* --exclude=lame-devel
+        sudo dnf group upgrade --with-optional Multimedia
+        ;;
+    apt) ;;
+
+    pacman) ;;
+
+    esac
+    ;;
 esac
 
 # important programs
 read -p "Install recommended software? [Y/n]:  " INSTALLPACKAGESIMP
 case $INSTALLPACKAGESIMP in
-n) echo "Skipping important software.";;
+n) echo "Skipping important software." ;;
 "" | *)
-PACKAGESIMP="kitty bat neofetch ranger"
-$PMINSTALL $PACKAGESIMP;;
+    PACKAGESIMP="kitty bat neofetch ranger"
+    $PMINSTALL $PACKAGESIMP
+    ;;
 esac
-
 
 # optional programs
 read -p "Install optional software? [y/N]:  " INSTALLPACKAGESOPT
 case INSTALLPACKAGESOPT in
 y | Y | yes | Yes | YES)
-flatpak install flathub md.obsidian.Obsidian
-flatpak install flathub com.vscodium.codium;;
-"" | *) echo "Skipping optional software."
+    flatpak install flathub md.obsidian.Obsidian
+    flatpak install flathub com.vscodium.codium
+    ;;
+"" | *) echo "Skipping optional software." ;;
 esac
-
-
-
-
 
 # configuration
 

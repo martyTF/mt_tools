@@ -4,4 +4,4 @@
 
 ### Installation
 
-> ```curl ```
+> ```curl https://github.com/martyTF/mt_tools/blob/master/install | sh```
