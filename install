@@ -49,12 +49,38 @@ which flatpak &>/dev/null && echo "flatpak update" >>/tmp/mt_update
 which snap &>/dev/null && echo "snap update" >>/tmp/mt_update
 which am &>/dev/null && echo "am update" >>/tmp/mt_update
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # required programs
+
+clear
+
 PACKAGESREQ="zsh flatpak git"
 $PMINSTALL $PACKAGESREQ
 
 # install flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+
+
+
+
+
+# proprietary software
+
+clear
 
 read -p "Install heavily recommended proprietary software? [Y/n]:  " INSTALLPACKAGESPROP
 case $INSTALLPACKAGESPROP in
@@ -78,7 +104,17 @@ n)
     ;;
 esac
 
+
+
+
+
+
+
+
 # important programs
+
+clear
+
 read -p "Install recommended software? [Y/n]:  " INSTALLPACKAGESIMP
 case $INSTALLPACKAGESIMP in
 n) echo "Skipping important software." ;;
@@ -98,7 +134,58 @@ y | Y | yes | Yes | YES)
 "" | *) echo "Skipping optional software." ;;
 esac
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# mt_tools
+
+clear
+
+read -p "Install mt_tools (daily workflow helper) [y/N]:  " INSTALLMT_TOOLS
+case $INSTALLMT_TOOLS in
+y | Y | yes | Yes | YES)
+    echo "Install as mt_tools or mt? This will be the command used to invoke this program. There are no major packages that use \"mt\", so it should be safe to use."
+    echo "1: mt_tools"
+    echo "2: mt"
+    read INSTALLMT_TOOLSAS
+    case $INSTALLMT_TOOLSAS in
+    1 | mt_tools)
+        wget https://raw.githubusercontent.com/martyTF/mt_tools/master/mt_tools && mv mt_tools "$HOME"/.local/share/bin/mt_tools
+        chmod +x "$HOME"/.local/share/bin/mt_tools
+        ;;
+    2 | mt)
+        wget https://raw.githubusercontent.com/martyTF/mt_tools/master/mt_tools && mv mt_tools "$HOME"/.local/share/bin/mt
+        chmod +x "$HOME"/.local/share/bin/mt
+        ;;
+    "" | *)
+        echo "Installing as mt_tools (default)"
+        wget https://raw.githubusercontent.com/martyTF/mt_tools/master/mt_tools && mv mt_tools "$HOME"/.local/share/bin/mt_tools
+        chmod +x "$HOME"/.local/share/bin/mt_tools
+        ;;
+    esac
+    ;;
+"" | *) echo "Skipping mt_tools." ;;
+esac
+
+
+
+
+
 # configuration
+
+clear
 
 mkdir $HOME/git $HOME/Applications "$HOME"/.config/mt_tools
 mkdir -p $HOME/.config/sway && cp -i /etc/sway/config $HOME/.config/sway/
+
+curl https://raw.githubusercontent.com/martyTF/mt_tools/master/configkitty | sh

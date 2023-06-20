@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------- #
+#       This is the sway config made by and mostly for marty        #
+#  The configuration is split into a main file (this file) and some #
+#  modules found in */sway/modules, that can each be finetuned for  #
+#  individual needs and setups. This software is delivered as-is    #
+#  and there is no guarantee given. Nearly everything has been      #
+#  documented, so you can learn everything yourself to configure.   #
+# ----------------------------------------------------------------- #
+
+### Input
+# Find your Keyboard type here: https://man.archlinux.org/man/xkeyboard-config.7.en#MODELS
+# and edit the following line accordingly (default QWERTY)
+# input * xkb_layout "us"
+
+# Enable Numlock on Startup (Default disabled, set to "enabled" only if you have a NumBlock)
+# input type:keyboard xkb_numlock disabled
+
+### Important Key Variables
+
+# Mod Key: Mod1 = Alt, Mod4 = Meta/Windows/Super Key
+
+# set $mod Mod1
+set $mod Mod4
+
+
+# Navigation keys: vim setup (hjkl) or arrow setup (˂˅˄˃)
+
+# Note: The media player section in */sway/modules/keybinds will overwrite j, k and l, so disable/edit these
+# first if you want to enable the vim setup
+
+# set $left h
+# set $down j
+# set $up k
+# set $right l
+
+set $left Left
+set $down Down
+set $up Up
+set $right Right
+
+# All other keybinds can be found in */sway/modules/keybinds
+
+
+### Terminal
+
+# Choose your preferred terminal emulator (make sure to have it installed first!)
+# Default: kitty
+set $term kitty
+
+
+### Launcher
+
+# Choose your preffered application launcher (make sure it is installed and appropriately configured first!)
+# Default: Rofi
+set $rofi_cmd rofi -terminal '$term'
+# Shows rofi combining drun and run modes
+set $menu $rofi_cmd -show combi -combi-modes drun#run -modes combi
+
+
+### Swayidle 
+# Disabled (Default)
+exec "killall swayidle"
+
+# Enabled
+# exec swayidle -w \
+#          timeout 300 'swaylock -f -c 000000' \
+#          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+#          before-sleep 'swaylock -f -c 000000'
+
+
+### Import modules
+# This will load all the variables set in mt install
+include "$HOME"/.config/mt_tools/sway
+# If these aren't loaded, overwriting e.g. keybinds found in them will throw a nag
+include /etc/sway/config.d/*
+# The configuration modules, load these after the line above!!!!
+include "$HOME"/.config/sway/modules/*
+# This will load all the variables set in mt install
+include "$HOME"/.config/mt_tools/swayextras
