@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # SHELLRC finder
+mkdir "$HOME"/git "$HOME"/Applications "$HOME"/.config/mt_tools "$HOME"/.config/waybar "$HOME"/.local/share/bin "$HOME"/.config/mt_tools "$HOME"/.local/share/fonts
+mkdir -p $HOME/.config/sway && cp -i /etc/sway/config $HOME/.config/sway/
+
+
+
 case "$SHELL" in
 *bash*)
     SHELLRC="$HOME/.bashrc" && export SHELLRC
@@ -29,6 +34,10 @@ case $ISPACMAN in
 esac
 
 # PMINSTALL and PMUPDATE manager
+PACKAGESREQ="zsh flatpak git"
+PACKAGESIMP="kitty bat neofetch ranger"
+PACKAGESOPT="tldr"
+
 
 case $PACKAGEMANAGER in
 dnf)
@@ -67,11 +76,29 @@ which am &>/dev/null && echo "am update" >>/tmp/mt_update
 
 clear
 
-PACKAGESREQ="zsh flatpak git"
 $PMINSTALL $PACKAGESREQ
+cd "$HOME"/Downloads
+wget http://zsync.moria.org.uk/download/zsync-0.6.2.tar.bz2
+tar -x -f zsync*
+cd $(echo zsync*/)
+./configure
+make -j4
+sudo make install
+cd "$HOME"/Downloads
+rm -r zsync*
+cd
+wget https://raw.githubusercontent.com/ivan-hc/APPLICATION-MANAGER/main/INSTALL && chmod a+x ./INSTALL && sudo ./INSTALL
+am -i appimagelauncher
 
 # install flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+
+
+
+
+
+
 
 
 
@@ -84,7 +111,7 @@ clear
 
 read -p "Install heavily recommended proprietary software? [Y/n]:  " INSTALLPACKAGESPROP
 case $INSTALLPACKAGESPROP in
-n)
+n | N | No | no | NO)
     echo "Skipping proprietary software."
     ;;
 "" | *)
@@ -111,6 +138,9 @@ esac
 
 
 
+
+
+
 # important programs
 
 clear
@@ -119,17 +149,33 @@ read -p "Install recommended software? [Y/n]:  " INSTALLPACKAGESIMP
 case $INSTALLPACKAGESIMP in
 n) echo "Skipping important software." ;;
 "" | *)
-    PACKAGESIMP="kitty bat neofetch ranger"
     $PMINSTALL $PACKAGESIMP
     ;;
 esac
 
+
+
+
+
+
+
+
+
+
+
+
 # optional programs
+
+clear
+
 read -p "Install optional software? [y/N]:  " INSTALLPACKAGESOPT
 case INSTALLPACKAGESOPT in
 y | Y | yes | Yes | YES)
+    $PMINSTALL $PACKAGESOPT
     flatpak install flathub md.obsidian.Obsidian
     flatpak install flathub com.vscodium.codium
+    am -i feishin
+    wget --output-document="$HOME"/.local/share/bin/pfetch https://raw.githubusercontent.com/andreasgrafen/pfetch-with-kitties/main/pfetch && chmod +x .local/share/bin/pfetch
     ;;
 "" | *) echo "Skipping optional software." ;;
 esac
@@ -185,7 +231,19 @@ esac
 
 clear
 
-mkdir $HOME/git $HOME/Applications "$HOME"/.config/mt_tools
-mkdir -p $HOME/.config/sway && cp -i /etc/sway/config $HOME/.config/sway/
 
 curl https://raw.githubusercontent.com/martyTF/mt_tools/master/configkitty | sh
+
+
+# customization
+
+cd "$HOME"/Downloads
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
+unzip FiraCode.zip
+mv *.ttf "$HOME"/.local/share/fonts
+rm FiraCode.zip LICENSE readme.md
+cd
+
+
+
+echo "include $HOME/.config/dotfiles/kitty/kitty.conf" >> ~/.config/kitty/kitty.conf
