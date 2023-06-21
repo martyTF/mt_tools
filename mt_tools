@@ -99,8 +99,6 @@ sleep)
     fi
 
     ;;
-
-\
     "" | help | -h | --help)
     # Help
     printf "
