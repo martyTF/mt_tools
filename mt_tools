@@ -3,9 +3,9 @@
 # Initiator
 
 case "$1" in
-update | -u)
+update)
     case "$2" in
-    packages | -p)
+    packages)
         # Update system
         which dnf &>/dev/null && echo "dnf update -y" >/tmp/update.sh
         which flatpak &>/dev/null && echo "flatpak update -y" >>/tmp/update.sh
@@ -15,34 +15,45 @@ update | -u)
         ;;
     "")
         printf "
-        -  -h  help            More detailed help page for the update tool
-        -  -s  system          Update everything listed below
-        -  -p  packages        Update your packages and programs
-        -  -c  config          Pulls the latest config by martyTF (https://github.com/martyTF/dotfiles) and applies it
+        -  help            More detailed help page for the update tool
+        -  system          Update everything listed below
+        -  packages        Update your packages and programs
+        -  config          Pulls the latest config by martyTF (https://github.com/martyTF/dotfiles) and applies it
         
         "
         ;;
     esac
     ;;
 
-network | -nw)
+network)
     case "$2" in
-    wifi | -w)
+    wifi)
         case "$3" in
-        scan | -s) ;;
-
-        connect | -c)
+        scan)
+            nmcli dev wifi show
+            ;;
+        connect)
             # WiFi
             read -p "WiFi-Name: " WIFINAME && read -p "WiFi Password: " WIFIPASSWORD
             WIFIDEVICE=$(networkctl | grep unmanaged | awk 'xor(/wlan/,/wifi/)' | head -1 | awk '{print $2}')
-            nmcli d wifi connect "$WIFINAME" password "$WIFIPASSWORD" ifname "$WIFIDEVICE"
+            nmcli dev wifi connect "$WIFINAME" password "$WIFIPASSWORD" ifname "$WIFIDEVICE"
             ;;
-        list | -l) ;;
+        list) ;;
 
         esac
         ;;
-    bluetooth | -b) ;;
+    bluetooth) ;;
+    help)
+        printf "
+        -    wifi            Scan for and connect to available WiFi connections 
+          -  scan            Only scan for available WiFi connections
+          -  connect         Connect to WiFi by WiFi-Name and WiFi-Password
+          -  list            List saved WiFi networks
 
+        -    bluetooth       Scan for and connect to available Bluetooth devices
+        
+        "
+        ;;
     esac
 
     ;;
@@ -57,13 +68,13 @@ sleep)
         "
         read -p "Proceed? Y/n" PROCEED
         if [ "$PROCEED" = n ]; then
-          exit
+            exit
         else
-        systemctl suspend
+            systemctl suspend
         fi
     elif [[ $2 =~ $CHECKTIME ]]; then
 
-        HUMANTIMESET=$2                                                                   # reads input
+        HUMANTIMESET=$2                                                                    # reads input
         PCTIMESET=$(echo $HUMANTIMESET | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }') # transforms input into pc readable
         # Check for today/tomorrow:
         CHECKTODAY=$(date +%s -d 'today 0:00')           # gets time of the beginning of today
@@ -89,26 +100,22 @@ sleep)
 
     ;;
 
-"" | help | -h | --help)
+\
+    "" | help | -h | --help)
     # Help
     printf "
     Welcome to the mt_tools, a set of scripts used for automating and simplifying normal end-user day-to-day workflows. 
     
     Usage: mt_tools [PROGRAM] [OPTIONS]  
-      -  -h    help            Display this help page
-      -  -u    update          Update parts of your system
-        -  -h  help            More detailed help page for the update tool
-        -  -s  system          Update everything listed below
-        -  -p  packages        Update your packages and programs
-        -  -c  config          Pulls the latest config by martyTF (https://github.com/martyTF/dotfiles) and applies it
-      -  -nw   network         Manage your connections
-        - -w   wifi            Scan for and connect to available WiFi connections 
-          - -s scan            Only scan for available WiFi connections
-          - -c connect         Connect to WiFi by WiFi-Name and WiFi-Password
-          - -l list            List saved WiFi networks
-        - -b   bluetooth       Scan for and connect to available Bluetooth devices
+      -      help            Display this help page
+      -      version         Show version and exit
+      -      update          Update parts of your system
+      -      network         Manage your connections
 
 
     "
+    ;;
+*)
+    echo "No available option specified. Use 'mt_tools help' to list available options"
     ;;
 esac

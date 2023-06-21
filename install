@@ -1,43 +1,18 @@
 #!/bin/bash
 
-# SHELLRC finder
-mkdir "$HOME"/git "$HOME"/Applications "$HOME"/.config/mt_tools "$HOME"/.config/waybar "$HOME"/.local/share/bin "$HOME"/.config/mt_tools "$HOME"/.local/share/fonts
-mkdir -p $HOME/.config/sway && cp -i /etc/sway/config $HOME/.config/sway/
+#
+### INITIALISATION
+#
+# CREATING IMPORTANT FOLDERS
 
+mkdir "$HOME"/git "$HOME"/Applications "$HOME"/.config/mt_tools "$HOME"/.config/waybar "$HOME"/.local/share/bin "$HOME"/.config/mt_tools "$HOME"/.local/share/fonts $HOME/.config/sway
 
+#
+# PACKAGEMANAGER FINDER
 
-case "$SHELL" in
-*bash*)
-    SHELLRC="$HOME/.bashrc" && export SHELLRC
-    ;;
-*zsh*)
-    SHELLRC="$HOME/.zshrc" && export SHELLRC
-    ;;
-esac
-
-# PACKAGEMANAGER finder
 which dnf &>/dev/null && PACKAGEMANAGER="dnf"
 which apt &>/dev/null && PACKAGEMANAGER="apt"
 which pacman &>/dev/null && PACKAGEMANAGER="pacman"
-
-cat $SHELLRC | grep "PACKAGEMANAGER" && ISPACMAN=1 || ISPACMAN=0
-
-case $ISPACMAN in
-0)
-    export PACKAGEMANAGER
-    echo "PACKAGEMANAGER=$PACKAGEMANAGER" >>$SHELLRC
-    echo "export PACKAGEMANAGER" >>$SHELLRC
-    ;;
-1)
-    echo "Package manager set to $PACKAGEMANAGER"
-    ;;
-esac
-
-# PMINSTALL and PMUPDATE manager
-PACKAGESREQ="zsh flatpak git"
-PACKAGESIMP="kitty bat neofetch ranger"
-PACKAGESOPT="tldr"
-
 
 case $PACKAGEMANAGER in
 dnf)
@@ -54,28 +29,72 @@ pacman)
     ;;
 esac
 
-which flatpak &>/dev/null && echo "flatpak update" >>/tmp/mt_update
-which snap &>/dev/null && echo "snap update" >>/tmp/mt_update
-which am &>/dev/null && echo "am update" >>/tmp/mt_update
+#
+# SHELL INSTALLER
 
+case "$SHELL" in
+*/bash)
+    SHELLRC="$HOME/.bashrc" && export SHELLRC
+    clear
+    read -p "bash detected as SHELL, should zsh be installed and set as the default SHELL instead? [y/N]  " INSTALLSZH
+    case $INSTALLZSH in
+    y | Y | yes | Yes | YES)
+        $PMINSTALL zsh
+        SHELLRC="$HOME/.zshrc" && export SHELLRC
+        chsh -s $(which zsh)
+        clear
+        echo "Changed SHELL to zsh, however this will only take effect after a relog. Log out now?"
+        read -p "You can continue this installation where you left off using the same command as before. [Y/n]  " SHELLRELOG
+        case $SHELLRELOG in
+        n | N | No | no | NO)
+            clear
+            echo "Changing the default SHELL to zsh will happen when you log out the next time."
+            echo "To revert to using bash as the default SHELL, use  chsh -s $(which bash)  , and go through the installation script again to apply everything to bash."
+            ;;
+        "" | *)
+            loginctl terminate-user $USER
+            ;;
+        esac
+        ;;
+    "" | *)
+        "Keep bash as SHELL."
+        ;;
+    esac
+    ;;
+*/zsh)
+    SHELLRC="$HOME/.zshrc" && export SHELLRC
+    ;;
+esac
 
+#
+## PACKAGEMANAGER CONFIGURATION 1
 
+cat $SHELLRC | grep "PACKAGEMANAGER" && ISPACMAN=1 || ISPACMAN=0
 
+case $ISPACMAN in
+0)
+    export PACKAGEMANAGER
+    echo "PACKAGEMANAGER=$PACKAGEMANAGER" >>$SHELLRC
+    echo "export PACKAGEMANAGER" >>$SHELLRC
+    ;;
+1)
+    echo "Package manager set to $PACKAGEMANAGER"
+    ;;
+esac
 
+#
+### SOFTWARE INSTALLATION
+#
+# SET PACKAGES
 
+PACKAGESREQ="flatpak git make"
+PACKAGESIMP="kitty bat neofetch ranger"
+PACKAGESOPT="tldr"
 
-
-
-
-
-
-
-
-
-# required programs
+#
+## REQUIRED SOFTWARE
 
 clear
-
 $PMINSTALL $PACKAGESREQ
 cd "$HOME"/Downloads
 wget http://zsync.moria.org.uk/download/zsync-0.6.2.tar.bz2
@@ -89,26 +108,15 @@ rm -r zsync*
 cd
 wget https://raw.githubusercontent.com/ivan-hc/APPLICATION-MANAGER/main/INSTALL && chmod a+x ./INSTALL && sudo ./INSTALL
 am -i appimagelauncher
-
-# install flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+echo "flatpak update" >>/tmp/mt_update
+echo "snap update" >>/tmp/mt_update
+echo "am update" >>/tmp/mt_update
 
-
-
-
-
-
-
-
-
-
-
-
-
-# proprietary software
+#
+# PROPRIETARY SOFTWARE (DRIVERS)
 
 clear
-
 read -p "Install heavily recommended proprietary software? [Y/n]:  " INSTALLPACKAGESPROP
 case $INSTALLPACKAGESPROP in
 n | N | No | no | NO)
@@ -131,43 +139,24 @@ n | N | No | no | NO)
     ;;
 esac
 
-
-
-
-
-
-
-
-
-
-
-# important programs
+#
+# IMPORTANT SOFTWARE
 
 clear
-
 read -p "Install recommended software? [Y/n]:  " INSTALLPACKAGESIMP
 case $INSTALLPACKAGESIMP in
-n) echo "Skipping important software." ;;
+n | N | No | no | NO)
+    echo "Skipping important software."
+    ;;
 "" | *)
     $PMINSTALL $PACKAGESIMP
     ;;
 esac
 
-
-
-
-
-
-
-
-
-
-
-
-# optional programs
+#
+# OPTIONAL SOFTWARE
 
 clear
-
 read -p "Install optional software? [y/N]:  " INSTALLPACKAGESOPT
 case INSTALLPACKAGESOPT in
 y | Y | yes | Yes | YES)
@@ -180,28 +169,15 @@ y | Y | yes | Yes | YES)
 "" | *) echo "Skipping optional software." ;;
 esac
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# mt_tools
+#
+# MT_TOOLS
 
 clear
-
 read -p "Install mt_tools (daily workflow helper) [y/N]:  " INSTALLMT_TOOLS
 case $INSTALLMT_TOOLS in
 y | Y | yes | Yes | YES)
     echo "Install as mt_tools or mt? This will be the command used to invoke this program. There are no major packages that use \"mt\", so it should be safe to use."
-    echo "1: mt_tools"
+    echo "1: mt_tools (default)"
     echo "2: mt"
     read INSTALLMT_TOOLSAS
     case $INSTALLMT_TOOLSAS in
@@ -220,30 +196,39 @@ y | Y | yes | Yes | YES)
         ;;
     esac
     ;;
-"" | *) echo "Skipping mt_tools." ;;
+"" | *)
+    echo "Skipping mt_tools."
+    ;;
 esac
 
-
-
-
-
-# configuration
+#
+# CONFIGURATION
 
 clear
-
-
-curl https://raw.githubusercontent.com/martyTF/mt_tools/master/configkitty | sh
-
-
-# customization
-
-cd "$HOME"/Downloads
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
-unzip FiraCode.zip
-mv *.ttf "$HOME"/.local/share/fonts
-rm FiraCode.zip LICENSE readme.md
-cd
-
-
-
-echo "include $HOME/.config/dotfiles/kitty/kitty.conf" >> ~/.config/kitty/kitty.conf
+read -p "Download and install the .config files (dotfiles) of MartyTF? [y/N]  " DOTFILESINSTALL
+case $DOTFILESSINSTALL in
+y | Y | yes | Yes | YES)
+    clear
+    echo "Applying the configuration will backup your existing dotfiles of sway, swaylock, sddm, kitty, ranger, and download and apply the dotfiles of MartyTF"
+    read -p "Continue? [y/N]  " DOTFILESCONFIRM
+    case $DOTFILESCONFIRM in
+    y | Y | yes | Yes | YES)
+        cp -i /etc/sway/config $HOME/.config/sway/
+        curl https://raw.githubusercontent.com/martyTF/mt_tools/master/configkitty | sh
+        cd "$HOME"/Downloads
+        wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
+        unzip FiraCode.zip
+        mv *.ttf "$HOME"/.local/share/fonts
+        rm FiraCode.zip LICENSE readme.md
+        cd
+        echo "include $HOME/.config/dotfiles/kitty/kitty.conf" >>~/.config/kitty/kitty.conf
+        ;;
+    "" | *)
+        echo "Aborting installing dotfiles."
+        ;;
+    esac
+    ;;
+"" | *)
+    echo "Skipping dotfiles."
+    ;;
+esac
