@@ -1,0 +1,8 @@
+configuration {
+  modi: "window,drun,ssh,combi";
+  font: "Comic Mono 20";
+  combi-modi: "window,drun,ssh";
+  location: 2;
+  
+}
+@theme "theme.rasi"

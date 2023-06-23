@@ -89,7 +89,7 @@ esac
 
 PACKAGESREQ="flatpak git make"
 PACKAGESIMP="kitty bat neofetch ranger"
-PACKAGESOPT="tldr"
+PACKAGESOPT="tldr prismlauncher dnf-plugins-core bat-extras steam discord"
 
 #
 ## REQUIRED SOFTWARE
@@ -160,6 +160,8 @@ clear
 read -p "Install optional software? [y/N]:  " INSTALLPACKAGESOPT
 case INSTALLPACKAGESOPT in
 y | Y | yes | Yes | YES)
+    sudo dnf copr enable g3tchoo/prismlauncher
+    sudo dnf copr enable awood/bat-extras
     $PMINSTALL $PACKAGESOPT
     flatpak install flathub md.obsidian.Obsidian
     flatpak install flathub com.vscodium.codium
@@ -213,15 +215,18 @@ y | Y | yes | Yes | YES)
     read -p "Continue? [y/N]  " DOTFILESCONFIRM
     case $DOTFILESCONFIRM in
     y | Y | yes | Yes | YES)
-        cp -i /etc/sway/config $HOME/.config/sway/
-        curl https://raw.githubusercontent.com/martyTF/mt_tools/master/configkitty | sh
+        # BACKUP
+        mkdir "$HOME"/.config/backup && mv 
         cd "$HOME"/Downloads
         wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
         unzip FiraCode.zip
         mv *.ttf "$HOME"/.local/share/fonts
         rm FiraCode.zip LICENSE readme.md
-        cd
-        echo "include $HOME/.config/dotfiles/kitty/kitty.conf" >>~/.config/kitty/kitty.conf
+        codium
+
+
+
+        sh 
         ;;
     "" | *)
         echo "Aborting installing dotfiles."

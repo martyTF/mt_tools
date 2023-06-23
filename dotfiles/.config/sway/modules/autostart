@@ -1,0 +1,31 @@
+#!/bin/bash
+
+### Put your own programs here.
+
+# Workspace 0
+exec "flatpak run com.github.iwalton3.jellyfin-media-player"
+
+# Workspace 1
+exec "/usr/lib64/discord/Discord"
+exec swaymsg "workspace 1; exec firefox"
+
+# Workspace 2
+exec "steam"
+exec "flatpak run com.heroicgameslauncher.hgl"
+
+# Workspace 3
+
+# Workspace 4
+exec swaymsg "workspace 4; exec kitty"
+
+# Workspace 5
+
+# Workspace 6
+exec "flatpak run md.obsidian.Obsidian"
+
+# Workspace 7
+exec "flatpak run com.vscodium.codium"
+# Workspace 8
+
+# Workspace 9
+exec "$HOME/AppImages/Sonixd*"

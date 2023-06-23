@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Enable German Keyboard Layout
+ input * xkb_layout "de"
+# Enable Numlock
+ input type:keyboard xkb_numlock disabled

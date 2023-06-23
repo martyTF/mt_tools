@@ -1,0 +1,125 @@
+#!/bin/bash
+### Syntax: bindsym keys exec "command"
+
+### Basics
+
+# Reload the config (reload is an inbuilt sway command, no exec or "" needed)
+bindsym $mod+Shift+c reload
+
+# Start a Terminal
+bindsym $mod+Return exec "$term"
+
+# Kill focused window (kill is an inbuilt sway command, no exec or "" needed)
+bindsym alt+f4 kill
+bindsym $mod+Shift+q kill
+
+# Launcher
+bindsym $mod+d exec "$menu"
+bindsym alt+space exec "$menu"
+
+### Navigation
+# Navigate focus on currently active workspaces (Mod + navkeys defined in main config file)
+
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+
+# Move/Shift focused window on currently active workspaces (Mod + shift + navkeys)
+
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+
+# Navigate workspaces (Mod + worksapce number)
+
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 0
+
+# Move/Shift focused window to workspace
+
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 0
+
+# Note: workspaces can have any name you want, not just numbers.
+# 0-9 are just set as the default.
+
+
+# Display based workspace switcher for multimonitor setup (Customizable, however you have to understand some bash to do so)
+# (Only really useful if workspaces are assigned to monitors in */sway/modules/workspaces)
+
+bindsym $mod+Ctrl+$right exec /home/marty/.config/sway/scripts/workspaceswitcher \
+right
+bindsym $mod+Ctrl+$left exec /home/marty/.config/sway/scripts/workspaceswitcher \
+left
+
+
+### Layout stuff
+# You can "split" the current object of your focus with
+# $mod+b or $mod+v, for horizontal and vertical splits
+# respectively.
+bindsym $mod+b splith
+bindsym $mod+v splitv
+# Switch the current container between different layout styles
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+# Make the current focus fullscreen
+bindsym $mod+f fullscreen
+# Toggle the current focus between tiling and floating mode
+bindsym $mod+t floating toggle
+# Swap focus between the tiling area and the floating area
+bindsym $mod+space focus mode_toggle
+# Move focus to the parent container
+bindsym $mod+a focus parent
+
+
+# Resizing containers
+# This will throw a bash script error, however sway can handle the {} stuff happening below
+bindsym $mod+r mode "resize"
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym $left resize shrink width 50px
+    bindsym $down resize grow height 50px
+    bindsym $up resize shrink height 50px
+    bindsym $right resize grow width 50px
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    }
+### Custom keybinds
+
+# Screenshot tool (Choose your own, default grimshot with copy/area, or save/screen with shift)
+bindsym Print exec grimshot copy area
+bindsym Shift+Print exec grimshot save screen
+
+# Media Player (overwrite vim style navkeys in main config file)
+
+bindsym $mod+j exec "playerctl previous"
+bindsym $mod+k exec "playerctl play-pause"
+bindsym $mod+l exec "playerctl next"
+
+# SSH into previously connected devices
+
+bindsym $mod+Ctrl+$down exec "rofi -show ssh"

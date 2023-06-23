@@ -1,0 +1,42 @@
+
+
+set $KEYBOARDLANG de
+set $NUMLOCKSTATE enabled
+
+# The basic colors
+set $COLOR_FG #cdd6f4
+set $COLOR_BG #1e1e2e
+
+# The 16 terminal colors
+
+# black
+set $COLOR_0 #181825
+set $COLOR_8 #11111b
+
+# red
+set $COLOR_1 #f38ba8
+set $COLOR_9 #eba0ac
+
+# green
+set $COLOR_2 #A6E3A1
+set $COLOR_10 #94e2d5
+
+# yellow
+set $COLOR_3 #F9E2AF
+set $COLOR_11 #fab387
+
+# blue
+set $COLOR_4 #74c7ec
+set $COLOR_12 #89b4fa
+
+# magenta
+set $COLOR_5 #f5c2e7
+set $COLOR_13 #cba6f7
+
+# cyan
+set $COLOR_6 #94e2d5
+set $COLOR_14 #89dceb
+
+# white
+set $COLOR_7 #f5e0dc
+set $COLOR_15 #f2cdcd
