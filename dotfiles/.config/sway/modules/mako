@@ -4,5 +4,5 @@
 #
 # Execute program; configuration included
 
-exec mako --max-history 10 --font "Comic Mono 13" --background-color "#282828" --text-color "#ebdbb2" --width 400 --height 200 --outer-margin 30 --border-size 3 --border-color "#689d6a" --border-radius 5 --icon 1 --max-visible 5 --output HDMI-A-1 --anchor top-right --default-timeout 20000 --progress-color "source #282828" --progress-color "over #689d6a"
+exec mako --max-history 10 --font "Comic Mono 13" --background-color "#282828" --text-color "#ebdbb2" --width 400 --height 200 --outer-margin 30 --border-size 3 --border-color "#689d6a" --border-radius 5 --icon 1 --max-visible 5 --output HDMI-A-1 --anchor top-right --default-timeout 10000 --progress-color "source #282828" --progress-color "over #689d6a"
 

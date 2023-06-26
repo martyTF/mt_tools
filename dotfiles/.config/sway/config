@@ -56,11 +56,11 @@ set $term kitty
 # Default: Rofi
 set $rofi_cmd rofi -terminal '$term'
 # Shows rofi combining drun and run modes
-set $menu $rofi_cmd -show combi -combi-modes drun#run -modes combi
+set $menu $rofi_cmd -show drun
 
 
 ### Swayidle 
-# Disabled (Default); Can be still be enabled via Swaybar's Idle toggle
+# Disabled (Default)
 exec "killall swayidle"
 
 # Enabled
@@ -69,10 +69,7 @@ exec "killall swayidle"
 #          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
 #          before-sleep 'swaylock -f -c 000000'
 
-
 ### Import modules
-# This will load all the variables set in mt install
-include "$HOME"/.config/mt_tools/swayvar
 # If these aren't loaded, overwriting e.g. keybinds found in them will throw a nag
 include /etc/sway/config.d/*
 # The configuration modules, load these after the line above!!!!
