@@ -2,4 +2,6 @@
 
 kitty +kitten themes Catppuccin-Mocha
 
-echo "include "$HOME"/.config/mt_tools/kitty.conf" >> "$HOME"/.config/kitty/kitty.conf
+curl https://raw.githubusercontent.com/martyTF/mt_tools/dotfiles/.config/kitty/kitty.conf | mv kitty.conf "$HOME"/.config/kitty/mt_kitty.conf
+
+echo "include "$HOME"/.config/kitty/mt_kitty.conf" >> "$HOME"/.config/kitty/kitty.conf
