@@ -69,6 +69,10 @@ exec "killall swayidle"
 #          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
 #          before-sleep 'swaylock -f -c 000000'
 
+
+### Polkit Manager
+# Gnome polkit
+exec /usr/libexec/polkit-gnome-authentication-agent-1
 ### Import modules
 # If these aren't loaded, overwriting e.g. keybinds found in them will throw a nag
 include /etc/sway/config.d/*
